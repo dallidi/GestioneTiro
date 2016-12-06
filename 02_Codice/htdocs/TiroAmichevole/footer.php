@@ -1,1 +1,1 @@
-  <p>Powered by Centro Professionale Tecnico Bellinzona</p>
+  <p>Powered by D. Allidi</p>
