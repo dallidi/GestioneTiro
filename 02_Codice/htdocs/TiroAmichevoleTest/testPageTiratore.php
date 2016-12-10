@@ -32,7 +32,8 @@
     <!-- ADD YOUR CODE HERE --------------------------------------------------->
       <?php 
         $tiratori = array();
-        findTiratori($tiratori, 0, "Nome15");
+        $idLicenze = array(999950);
+        findTiratori($tiratori, $idLicenze, "");
         arrayToHtmlTable($tiratori, "Tiratore::compFullName");
       ?>
     <!-- END OF CUSTOM PAGE CODE ---------------------------------------------->

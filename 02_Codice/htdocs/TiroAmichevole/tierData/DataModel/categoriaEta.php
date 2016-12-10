@@ -38,21 +38,76 @@
     {
       global $db;
       $sql = "SELECT * FROM CategoriaEta
-              WHERE idCategoria = '$idCatArma'";
+              WHERE idCategoriaEta = '$idCatArma'";
       $rows = $db->query($sql);
       $r = $rows->fetch();
       return CategoriaArma::Create($r["idCategoriaEta"], $r["descrizione"],
                                    $r["codice"], $r["etaMin"], $r["etaMax"]);
     }
+    
+    function compEta($a, $b)
+    {
+      if ($a->EtaMin() == $b->EtaMin()){
+        return 0;
+      }elseif ($a->EtaMin() < $b->EtaMin()){
+        return -1;
+      }
+      return 1;
+    }
   }
   
-  function compEta($a, $b)
-  {
-    if ($a->EtaMin() == $b->EtaMin()){
-      return 0;
-    }elseif ($a->EtaMin() < $b->EtaMin()){
-      return -1;
+  function findCatEta(&$listaCatEta, $ids = "",
+                       $codiceCat = "", $descrizione = ""){
+    global $db;
+    $query = "";
+    if ($codiceCat != ""){
+      $query = " OR codiceCat LIKE '%$codiceCat%'";
     }
-    return 1;
+    if ($descrizione != ""){
+      $query = " OR descrizione LIKE '%$descrizione%'";
+    }
+    $idList = implode(',', $ids);  
+    if ($idList == ""){
+      $idList = "0";
+    }
+    $sql = "SELECT * FROM `Licenze` 
+            WHERE idLicenza IN ($idList) $query;";
+    dbgTrace  ($sql);
+    $rows = $db->query($sql);
+    while ($r = $rows->fetch())
+    {
+      $id = $r['idCategoria'];
+      $listaCatEta[$id] = CategoriaEta::LoadDbData($id);
+    }
+  }
+  
+  function catEtaForDataNascita(&$listaCatEta, $dataNascita){
+    global $db;
+    $age = date("Y") - date("Y", $dataNascita);
+    $sql = "SELECT idCategoriaEta, etaMin, etaMax 
+            FROM `CategoriaEta` 
+            WHERE etaMin <= $age <= etaMax
+            ORDER BY etaMin DESC";
+    dbgTrace  ($sql);
+    $rows = $db->query($sql);
+    while ($r = $rows->fetch())
+    {
+      $id = $r['idCategoria'];
+      $listaCatEta[$id] = CategoriaEta::LoadDbData($id);
+    }
+  }
+  
+  function allCatEta(&$listaCatEta){
+    global $db;
+    $sql = "SELECT idCategoriaEta, etaMin
+            FROM `CategoriaEta` 
+            ORDER BY etaMin ASC";
+    dbgTrace  ($sql);
+    $rows = $db->query($sql);
+    while ($r = $rows->fetch())
+    {
+      $id = $r['idCategoriaEta'];
+      $listaCatEta[$id] = CategoriaEta::LoadDbData($id);
+    }
   }
 ?>

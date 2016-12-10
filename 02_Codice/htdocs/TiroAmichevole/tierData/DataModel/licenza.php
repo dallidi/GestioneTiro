@@ -5,6 +5,8 @@
   require_once 'societa.php';
   require_once $_SERVER["DOCUMENT_ROOT"].
                '/TiroAmichevole/TierData/DbInterface/CommonDB.php';
+  require_once $_SERVER["DOCUMENT_ROOT"].
+               '/TiroAmichevole/helpers/Debug.php';
   
   class Licenza {
     public $Id;
@@ -43,6 +45,41 @@
       $instance->Indirizzo->Luogo = $Luogo;
       $instance->Societa = $Societa;
       return $instance;
+    }
+
+    public function id(){
+      return $this->Id;
+    }
+    
+    public function nome(){
+      return $this->Nome;
+    }
+    
+    public function cognome(){
+      return $this->Cognome;
+    }
+    
+    public function dataNascita(){
+      return $this->DataNascita;
+    }
+    
+    public function indirizzo(){
+      return $this->Indirizzo->Via . " " . $this->Indirizzo->ViaNo;
+    }
+    
+    public function localita(){
+      return $this->Indirizzo->Cap . " " . $this->Indirizzo->Luogo;
+    }
+    
+    public function nomeSocieta(){
+      if (count($this->Societa) > 0){
+        return reset($this->Societa)->Nome;
+      }
+      return "";
+    }
+    
+    public function listaSocieta(){
+      return $this->Societa;
     }
     
     public static function LoadDbData($idLic)
@@ -85,13 +122,22 @@
     
   }
   
-  function findLicenze(&$listaLic, $idLicenza, $query){
+  function findLicenze(&$listaLic, $idLicenze, $nome = "", $cognome = ""){
     global $db;
-    $query = '%' . $query . '%';
+    $query = "";
+    if ($nome != ""){
+      $query = " OR nome LIKE '%$nome%'";
+    }
+    if ($cognome != ""){
+      $query = " OR cognome LIKE '%$cognome%'";
+    }
+    $idList = implode(',', $idLicenze);  
+    if ($idList == ""){
+      $idList = "0";
+    }
     $sql = "SELECT * FROM `Licenze` 
-            WHERE idLicenza = '" . $idLicenza . "' OR 
-                  cognome LIKE '" . $query . "' OR 
-                  nome LIKE '" . $query . "'";
+            WHERE idLicenza IN ($idList) $query;";
+    dbgTrace  ($sql);
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {

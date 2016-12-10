@@ -22,8 +22,7 @@
 ?>
   <div class="navigation col-2">
     <ul class="verticalMenu <?php addOpt($classOption, "all") ?>">
-      <li class="<?php addOpt($classOption, 'testPage') ?>"><a href="/TiroAmichevole/testPage.php">Test Page</a></li>
-      <li class="<?php addOpt($classOption, 'iscrizioni') ?>"><a href="nav/iscrizioni/iscriviTiratore.php">Iscrizioni</a></li>
+      <li class="<?php addOpt($classOption, 'iscrizioni') ?>"><a href="/TiroAmichevole/nav/iscrizioni/trovaTiratore.php">Iscrizioni</a></li>
       <li class="<?php addOpt($classOption, 'risultati') ?>"><a href="#">Risultati</a></li>
       <li class="<?php addOpt($classOption, 'classifiche') ?>"><a href="#">Classifiche</a></li>
       <li class="<?php addOpt($classOption, 'rapporti') ?>"><a href="#">Rapporti</a></li>

@@ -21,6 +21,11 @@
     
     public function tiratoreNil()
     {
+      $this->Licenza = new Licenza();
+      $this->CatArma = new CategoriaArma();
+      $this->CatEta = new CategoriaEta();
+      $this->Societa = new Societa();
+      $this->Serie = array();
     }
 
     public function __construct()
@@ -38,7 +43,45 @@
       $instance->Serie = $Serie;
       return $instance;
     }
-
+    
+    
+    
+    public function id(){
+      return $this->Licenza->id();
+    }
+    
+    public function nome(){
+      return $this->Licenza->nome();
+    }
+    
+    public function cognome(){
+      return $this->Licenza->cognome();
+    }
+    
+    public function dataNascita(){
+      return $this->Licenza->dataNascita();
+    }
+    
+    public function indirizzo(){
+      return $this->Licenza->indirizzo();
+    }
+    
+    public function localita(){
+      return $this->Licenza->localita();
+    }
+    
+    public function listaSocieta(){
+      return $this->Licenza->listaSocieta();
+    }
+    
+    public function catArmaDescr(){
+      return $this->CatArma->Descrizione;
+    }
+    
+    public function catArmaId(){
+      return $this->CatArma->catArmaId();
+    }
+    
     public static function LoadDbData($idLic)
     {
       global $db;
@@ -103,16 +146,21 @@
       }
   }
    
-  function findTiratori(&$tiratori, $idLicenza, $query){
+  function findTiratori(&$tiratori, $idLicenze, $nome = "", $cognome = ""){
     global $db;
+    $idList = implode(',', $idLicenze);
+    if ($idList == ""){
+      $idList = "0";
+    }
     $sql = "SELECT * FROM `Iscrizioni` 
-            WHERE Licenze_idLicenza = '$idLicenza'";
+            WHERE Licenze_idLicenza IN ($idList);";
+    dbgTrace($sql);
     $rows = $db->query($sql);
     if ($r = $rows->fetch()){
       $licId = $r['idLicenza'];
       $tiratori[$licId] = Tiratore::LoadDbData($licId);
+      return;
     }
-    findLicenze($tiratori, $idLicenza, $query);
   }
  
 ?>

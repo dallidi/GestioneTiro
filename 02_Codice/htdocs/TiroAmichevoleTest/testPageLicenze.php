@@ -31,7 +31,8 @@
     <!-- ADD YOUR CODE HERE ----------------------------------------------------->
       <?php 
         $listaLicenze = array();
-        findLicenze($listaLicenze, 0, "Nome15");
+        $idLicenze = array(999950,999951,999952,999953,999954,999955,999956);
+        findLicenze($listaLicenze, $idLicenze, "Nome17");
         arrayToHtmlTable($listaLicenze);
       ?>
     <!-- END OF CUSTOM PAGE CODE ------------------------------------------------>

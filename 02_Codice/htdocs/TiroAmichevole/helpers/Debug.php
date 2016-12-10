@@ -6,7 +6,7 @@
   }
   
   // $level might be one of the following: INFO, ERROR
-  function dbgTrace($level, $message){
+  function dbgTrace($message, $level = "INFO"){
     $trace = debug_backtrace()[0];
     error_log("DBG;".$level.";'".$trace["file"]."';".$trace["line"].
               ";'".$message."'");
