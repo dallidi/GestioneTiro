@@ -1,12 +1,6 @@
 <?php
   // require $_SERVER['DOCUMENT_ROOT']."/TiroAmichevole/head.php"; 
-  $__ROOT__ = $_SERVER['DOCUMENT_ROOT']."/TiroAmichevole";
-  function internalRedirectTo($path){
-    header("Location: ".internaleRedirectToUrl($path));
-  }
-  function makeUrl($path){
-    return "/TiroAmichevole/$path";
-  }
+  require_once $_SERVER['DOCUMENT_ROOT']."/TiroAmichevole/baseUrl.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">

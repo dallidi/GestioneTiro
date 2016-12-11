@@ -13,8 +13,22 @@
     ?>
     <div id="pageHtml" class="col-8">
     <!-- ADD YOUR CODE HERE --------------------------------------------------->
-      <?php 
+      <h1>Errore</h1>
+      <p>
+      <?php
+        $errText = "È avvenuto un errore sconosciuto, riprova...";
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+          if (isset($_POST["errText"])){
+            $errText = $_POST["errText"];
+          }
+        } else if ($_SERVER["REQUEST_METHOD"] == "GET"){
+          if (isset($_GET["errText"])){
+            $errText = $_GET["errText"];
+          }
+        }
+        echo $errText;
       ?>
+      </p>
 
     <!-- END OF CUSTOM PAGE CODE ---------------------------------------------->
     </div>

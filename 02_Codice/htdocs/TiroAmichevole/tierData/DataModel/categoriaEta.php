@@ -34,15 +34,17 @@
       return $instance;
     }
 
-    public static function LoadDbData($idCatArma)
+    public static function LoadDbData($idCatEta)
     {
       global $db;
       $sql = "SELECT * FROM CategoriaEta
-              WHERE idCategoriaEta = '$idCatArma'";
+              WHERE idCategoriaEta = '$idCatEta'";
       $rows = $db->query($sql);
-      $r = $rows->fetch();
-      return CategoriaArma::Create($r["idCategoriaEta"], $r["descrizione"],
-                                   $r["codice"], $r["etaMin"], $r["etaMax"]);
+      if ($r = $rows->fetch()){
+        return CategoriaArma::Create($r["idCategoriaEta"], $r["descrizione"],
+                                     $r["codice"], $r["etaMin"], $r["etaMax"]);
+      }
+      return NULL;
     }
     
     function compEta($a, $b)

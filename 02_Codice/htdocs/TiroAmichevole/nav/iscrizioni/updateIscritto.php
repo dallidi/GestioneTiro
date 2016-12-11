@@ -12,11 +12,11 @@
        require "$__ROOT__/navigation.php" 
     ?>
     <div id="pageHtml" class="col-8">
-    <!-- ADD YOUR CODE HERE --------------------------------------------------->
-      <?php 
+    <!-- ADD YOUR CODE HERE ----------------------------------------------------->
+      <?php
+        require "updateIscrittoPage.php";
       ?>
-
-    <!-- END OF CUSTOM PAGE CODE ---------------------------------------------->
+    <!-- END OF CUSTOM PAGE CODE ------------------------------------------------>
     </div>
     <?php
        $classOption["all"] = "disabled";  // all -> entire list

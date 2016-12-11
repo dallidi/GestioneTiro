@@ -1,7 +1,7 @@
 <?php 
  // require_once "$_SERVER["DOCUMENT_ROOT"]/TiroAmichevole".
-              // "/indirizzo.php";
- class Address {
+              // "/TierData/DataModel/indirizzo.php";
+ class Indirizzo {
     public $Via;
     public $ViaNo;
     public $Cap;
@@ -15,7 +15,7 @@
       $this->Luogo ="";
     }
     
-    public static function Create($Via, $ViaNo, $Cap, $Luogo)
+    public static function create($Via, $ViaNo, $Cap, $Luogo)
     {
       $instance = new self();
       $instance->Via = $Via;

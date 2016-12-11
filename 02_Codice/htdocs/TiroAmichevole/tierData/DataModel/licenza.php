@@ -14,37 +14,103 @@
     public $Cognome;
     public $DataNascita;
     public $Indirizzo;
-    public $Societa;
+    public $ListaSoc;
     
-    public function licenzaNil()
-    {
-      $this->Id = 0;
-      $this->Nome = "";
-      $this->Cognome = "";
-      $this->DataNascita = date("d.m.Y");
-      $this->Indirizzo = new Address;
-      $this->Societa = array();
-    }
-
     public function __construct()
     {
-      $this->licenzaNil();
     }
     
-    public static function Create($Id, $Nome, $Cognome, $DataNascita,
-                                  $Via, $ViaNo, $Cap, $Luogo, $Societa)
+    public static function create($Id, $Nome, $Cognome, $DataNascita,
+                                  $Indirizzo, $ListaSoc)
     {
       $instance = new self();
       $instance->Id = $Id;
       $instance->Nome = $Nome;
       $instance->Cognome = $Cognome;
       $instance->DataNascita = $DataNascita;
-      $instance->Indirizzo->Via = $Via;
-      $instance->Indirizzo->ViaNo = $ViaNo;
-      $instance->Indirizzo->Cap = $Cap;
-      $instance->Indirizzo->Luogo = $Luogo;
-      $instance->Societa = $Societa;
+      $instance->Indirizzo = $Indirizzo;
+      $instance->ListaSoc = $ListaSoc;
       return $instance;
+    }
+    
+    public static function loadDbData(&$instances, $idLicenze,
+                                      $nome = "", $cognome = "")
+    {
+      global $db;
+      $idList = implode(',', $idLicenze);
+      dbgTrace($idList);
+      if ($idList == ""){
+        $idList = "0";
+      }
+      $query = "idLicenza IN ($idList)";
+      $orderBy = "ORDER BY idLicenza";
+      
+      if ($nome != ""){
+        $query = "$query OR nome LIKE '%$nome%'";
+        $orderBy = "ORDER BY nome";
+      }
+      if ($cognome != ""){
+        $query = "$query OR cognome LIKE '%$cognome%'";
+        $orderBy = "ORDER BY cognome";
+      }
+      $where = "";
+      if ($query != "")
+      {
+        $where = "WHERE $query";
+      }
+      $sql = "SELECT *
+              FROM Licenze
+              $where";
+      dbgTrace($sql);
+      $rows = $db->query($sql);
+      while ($r = $rows->fetch())
+      {
+        $idLic = $r["idLicenza"];
+        $socList = array();
+        $sql = "SELECT idSocieta
+                FROM Licenze_has_societa
+                JOIN Societa
+                ON Licenze_has_societa.Societa_idSocieta = Societa.idSocieta
+                WHERE Licenze_has_societa.Licenze_idLicenza = $idLic";
+        $societa = $db->query($sql);
+        while ($s = $societa->fetch())
+        {
+          $idList = array();
+          $idSoc = $s["idSocieta"];
+          $idList[] = $idSoc;
+          Societa::loadDbData($socList, $idList);
+        }
+        $indirizzo = Indirizzo::create($r["via"], $r["viaNo"],
+                                       $r["cap"], $r["luogo"]);
+        $instances[$idLic] =
+          Licenza::create($idLic, $r["nome"], $r["cognome"],
+                          sqlToPhpDate($r["dataNascita"], "d.m.Y"),
+                          $indirizzo, $socList);
+      }
+    }
+
+    public static function licenceDbData($idLicenza)
+    {
+      $tiratori = array();
+      $ids = array($idLicenza);
+      Licenza::loadDbData($tiratori, $ids);
+      if (count($tiratori) != 1){
+        dbgTrace("ERROR", "Tiratore non univoco $id. ".$tiratori);
+        throw new Exception("Tiratore non univoco $id. $tiratori");
+      }
+      return reset($tiratori);
+    }
+    
+    
+    public function iscrivi(){
+      global $db;
+      $id = $this->Id;
+      $sql = "INSERT INTO Iscrizioni
+              (Licenze_idLicenza)
+              VALUES
+              ($id)";
+      dbgTrace($sql);
+      $db->query($sql);
     }
 
     public function id(){
@@ -71,39 +137,8 @@
       return $this->Indirizzo->Cap . " " . $this->Indirizzo->Luogo;
     }
     
-    public function nomeSocieta(){
-      if (count($this->Societa) > 0){
-        return reset($this->Societa)->Nome;
-      }
-      return "";
-    }
-    
     public function listaSocieta(){
-      return $this->Societa;
-    }
-    
-    public static function LoadDbData($idLic)
-    {
-      global $db;
-      $sql = "SELECT * FROM Licenze_has_Societa AS LicSoc
-              WHERE LicSoc.Licenze_idLicenza = '$idLic'";
-      $rows = $db->query($sql);
-      $listaSocieta = array();
-      while ($r = $rows->fetch())
-      {
-        $idSoc = $r["Societa_idSocieta"];
-        $listaSocieta[$idSoc] = Societa::LoadDbData($idSoc);
-      }
-
-      $sql = "SELECT * FROM Licenze AS Lic
-              WHERE Lic.idLicenza = '$idLic'";
-      $rows = $db->query($sql);
-      $r = $rows->fetch();
-      return Licenza::Create(
-                   $r["idLicenza"], $r["Nome"], $r["Cognome"], 
-                   sqlToPhpDate($r["DataNascita"], "d.m.Y"), 
-                   $r["Via"], $r["ViaNo"], $r["CAP"], $r["Luogo"],
-                   $listaSocieta);
+      return $this->ListaSoc;
     }
     
     public function fullName(){
@@ -122,28 +157,5 @@
     
   }
   
-  function findLicenze(&$listaLic, $idLicenze, $nome = "", $cognome = ""){
-    global $db;
-    $query = "";
-    if ($nome != ""){
-      $query = " OR nome LIKE '%$nome%'";
-    }
-    if ($cognome != ""){
-      $query = " OR cognome LIKE '%$cognome%'";
-    }
-    $idList = implode(',', $idLicenze);  
-    if ($idList == ""){
-      $idList = "0";
-    }
-    $sql = "SELECT * FROM `Licenze` 
-            WHERE idLicenza IN ($idList) $query;";
-    dbgTrace  ($sql);
-    $rows = $db->query($sql);
-    while ($r = $rows->fetch())
-    {
-      $licId = $r['idLicenza'];
-      $listaLic[$licId] = Licenza::LoadDbData($licId);
-    }
-  }
   
 ?>

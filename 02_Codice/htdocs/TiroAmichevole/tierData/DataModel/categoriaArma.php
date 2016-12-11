@@ -8,14 +8,10 @@
     
     public function categoriaArmaNil()
     {
-      $this->Id = 0;
-      $this->CodiceCat = "";
-      $this->Descrizione = "";
     }
 
     public function __construct()
     {
-      $this->categoriaArmaNil();
     }
     
     public static function Create($Id, $CodiceCat, $Descrizione)
@@ -33,9 +29,11 @@
       $sql = "SELECT * FROM CategoriaArmi
               WHERE idCategoria = '$idCatArma'";
       $rows = $db->query($sql);
-      $r = $rows->fetch();
-      return CategoriaArma::Create($r["idCategoria"], 
-                                   $r["codiceCat"], $r["descrizione"]);
+      if ($r = $rows->fetch()){
+        return CategoriaArma::Create($r["idCategoria"], 
+                                     $r["codiceCat"], $r["descrizione"]);
+      }
+      return NULL;
     }
     
     public static function compCodiceCat($a, $b){

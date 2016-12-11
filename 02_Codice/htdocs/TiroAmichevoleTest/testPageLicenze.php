@@ -6,12 +6,30 @@
   {
     echo "<table>
           <thead>
-            <tr><th>Key</th><th>Value</th></tr>
+            <tr><th>Key</th>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Nascita</th>
+              <th>Indirizzo</th>
+              <th>Società</th>
+            </tr>
           </thead>
           <tbody>";
     foreach ($anArray as $key => $value) {
-      $valStr = $value->Nome;
-      echo "<tr><td>$key</td><td>$valStr</td></tr>";
+      $socHtml = "<ul>";
+      foreach ($value->listaSocieta() as $socKey => $socValue){
+        $socHtml = "$socHtml <li>".$socValue->fullName()."</li>";
+      }
+      $socHtml = "$socHtml </ul>";
+      
+      echo "<tr>
+              <td>$key</td>
+              <td>".$value->nome()."</td>
+              <td>".$value->cognome()."</td>
+              <td>".$value->dataNascita()."</td>
+              <td>".$value->indirizzo()."<br>".$value->localita()."</td>
+              <td>$socHtml</td>
+            </tr>";
     }
     echo "</tbody>
           </table>";    
@@ -31,8 +49,9 @@
     <!-- ADD YOUR CODE HERE ----------------------------------------------------->
       <?php 
         $listaLicenze = array();
-        $idLicenze = array(999950,999951,999952,999953,999954,999955,999956);
-        findLicenze($listaLicenze, $idLicenze, "Nome17");
+        $idLicenze = array(999950,999951,999952,999953,999954,999955,999956,
+                           999990);
+        Licenza::loadDbData($listaLicenze, $idLicenze);
         arrayToHtmlTable($listaLicenze);
       ?>
     <!-- END OF CUSTOM PAGE CODE ------------------------------------------------>

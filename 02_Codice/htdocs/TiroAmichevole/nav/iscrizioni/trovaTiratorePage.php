@@ -1,6 +1,6 @@
 <?php
   require_once "$__ROOT__/TierData/DbInterface/CommonDB.php";
-  require_once "$__ROOT__/TierData/dataModel/tiratore.php";
+  require_once "$__ROOT__/TierData/dataModel/iscritto.php";
   require_once "$__ROOT__/helpers/debug.php";
 ?>
 

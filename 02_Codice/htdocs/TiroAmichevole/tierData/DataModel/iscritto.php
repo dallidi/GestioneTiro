@@ -1,6 +1,6 @@
 <?php 
   // require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
-               // '/TierData/DataModel/tiratore.php';
+               // '/TierData/DataModel/iscritto.php';
   require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
                "/TierData/DataModel/licenza.php";
   require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
@@ -12,30 +12,23 @@
   require_once $_SERVER["DOCUMENT_ROOT"].
                '/TiroAmichevole/TierData/DbInterface/CommonDB.php';
   
-  class Tiratore {
+  class Iscritto {
+    public $Id;
     public $Licenza;
     public $CatArma;
     public $CatEta;
     public $Societa;
     public $Serie;
     
-    public function tiratoreNil()
-    {
-      $this->Licenza = new Licenza();
-      $this->CatArma = new CategoriaArma();
-      $this->CatEta = new CategoriaEta();
-      $this->Societa = new Societa();
-      $this->Serie = array();
-    }
-
     public function __construct()
     {
-      $this->tiratoreNil();
+      
     }
     
-    public static function Create($Licenza, $CatArma, $CatEta, $Societa, $Serie)
+    public static function create($Id, $Licenza, $CatArma, $CatEta, $Societa, $Serie)
     {
       $instance = new self();
+      $instance->Id = $Id;
       $instance->Licenza = $Licenza;
       $instance->CatArma = $CatArma;
       $instance->CatEta = $CatEta;
@@ -43,8 +36,44 @@
       $instance->Serie = $Serie;
       return $instance;
     }
-    
-    
+
+    public static function loadDbData(&$instances, $idIscritti,
+                                      $nome = "", $cognome = "")
+    {
+      global $db;
+      $idList = implode(',', $idIscritti);
+      if ($idList == ""){
+        $idList = "0";
+      }
+      $query = "Licenze_idLicenza IN ($idList)";    
+      $sql = "SELECT * FROM `Iscrizioni` 
+              WHERE $query";
+      dbgTrace($sql);
+      $rows = $db->query($sql);
+      while ($r = $rows->fetch()){
+        $idLic = $r["Licenze_idLicenza"];
+
+
+
+  // $tiratori = array();
+  // $ids = array($id);
+  // Licenza::loadDbData($tiratori, $ids);
+  // if (count($tiratori) != 1){
+    // internalRedirectTo("/nav/error.php?errTxt=Tiratore non univoco!");
+    // dbgTrace("ERROR", "Tiratore non univoco $id. ".$tiratori);
+    // return;
+  // }
+  // $tiratore = reset($tiratori);
+
+        $instances[$idLic] = 
+          Iscritto::create($idLic, 
+                   Licenza::licenceDbData($idLic),
+                   CategoriaArma::loadDbData($r["CategoriaArmi_idCategoria"]),  
+                   CategoriaEta::loadDbData($r["CategoriaEta_idCategoriaEta"]),
+                   Societa::societaDbData($r["Societa_idSocieta"]),
+                   NULL);
+      }
+    }
     
     public function id(){
       return $this->Licenza->id();
@@ -82,39 +111,6 @@
       return $this->CatArma->catArmaId();
     }
     
-    public static function LoadDbData($idLic)
-    {
-      global $db;
-      $sql = "SELECT * FROM Iscrizioni
-              WHERE Iscrizioni.Licenze_idLicenza = '$idLic'";
-      $rows = $db->query($sql);
-      $r = $rows->fetch();
-      
-      $licId = $r["Licenze_idLicenza"];
-      $instance->Licenza = Licenza::LoadDbData($licId);
-      $idCatArma = $r["CategoriaArmi_idCategoria"];
-      if ($idCatArma){
-        $instance->CatArma = CategoriaArma::LoadDbData($idCatArma);
-      }
-      $idCatEta = $r["CategoriaEta_idCategoriaEta"];
-      if ($idCatEta){
-        $instance->CatEta = CategoriaEta::LoadDbData($idCatEta);
-      }
-      $idSoc = $r["Societa_idSocieta"];
-      if ($idSoc){
-        $instance->Societa = Societa::LoadDbData($idSoc);
-      }
-      
-      $sql = "SELECT * FROM Inscrizioni_has_Serie AS IscrSerie
-              WHERE IscrSerie.Inscrizioni_Licenze_idLicenza = '$idLic'";
-      $rows = $db->query($sql);
-      $listaSerie = array();
-      while ($r = $rows->fetch())
-      {
-        $idSerie = $r["Serie_idSerie"];
-        $instance->Serie[$idSerie] = Serie::LoadDbData($idSerie);
-      }
-    }
 
     public function fullName(){
       return $this->Licenza->Cognome . " " . $this->Licenza->Nome;
@@ -144,23 +140,5 @@
     function iscrivi(){
         global $db;
       }
-  }
-   
-  function findTiratori(&$tiratori, $idLicenze, $nome = "", $cognome = ""){
-    global $db;
-    $idList = implode(',', $idLicenze);
-    if ($idList == ""){
-      $idList = "0";
-    }
-    $sql = "SELECT * FROM `Iscrizioni` 
-            WHERE Licenze_idLicenza IN ($idList);";
-    dbgTrace($sql);
-    $rows = $db->query($sql);
-    if ($r = $rows->fetch()){
-      $licId = $r['idLicenza'];
-      $tiratori[$licId] = Tiratore::LoadDbData($licId);
-      return;
-    }
-  }
- 
+  } 
 ?>
