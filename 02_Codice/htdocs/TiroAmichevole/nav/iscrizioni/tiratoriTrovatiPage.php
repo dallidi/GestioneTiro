@@ -13,7 +13,7 @@
   
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["licenza"])){
-      $licId = $_POST["licenza"];
+      $licId = intval($_POST["licenza"]);
     }
     if (isset($_POST["nome"])){
       $nome = $_POST["nome"];
@@ -61,11 +61,15 @@ function iscriviTiratore(idLicenza){
         $id = $iscritto->id();
         echo '<tr onclick="iscriviTiratore('.$id.')">
                 <td>hidden col</td>
-                <td>'.$id().'</td>
+                <td>'.$id.'</td>
                 <td>'.$iscritto->cognome().'</td>
                 <td>'.$iscritto->nome().'</td>
                 <td>'.$iscritto->dataNascita().'</td>
-                <td>'.$iscritto->nomeSocieta().'</td>
+                <td><ul>';
+                foreach ($iscritto->listaSocieta() as $socKey => $socValue){
+                  echo "<li>".$socValue->fullName()."</li>";
+                }
+                echo '</ul></td>
               </tr>';
       }
     } else {
