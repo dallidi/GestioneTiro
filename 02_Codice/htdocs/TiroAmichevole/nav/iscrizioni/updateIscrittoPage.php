@@ -51,8 +51,12 @@
         foreach($socList as $soc){
           $socId = $soc->Id;
           $socName = $soc->Nome;
+          $selected = "";
+          if ($iscritto->Societa->Id == $socId){
+            $selected = "selected";
+          }
           if ($multiple){
-            echo "<option value='$socId'>$socName</option>";
+            echo "<option value='$socId' $selected>$socName</option>";
           } else {
             echo "<input type='hidden' name='societa' value='$socId'>$socName";
           }
