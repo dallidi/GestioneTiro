@@ -37,16 +37,11 @@ function sendIdLicenzaTo(idLicenza, url){
   form.submit();
 }
 
-function updateIscritto(idLicenza){
-  sendIdLicenzaTo(idLicenza, 
-              "<?php echo makeUrl("/nav/iscrizioni/updateIscritto.php") ?>");
-}
-
 function iscriviTiratore(idLicenza){
   sendIdLicenzaTo(idLicenza, 
               "<?php echo makeUrl("/nav/iscrizioni/iscriviTiratore.php") ?>");
 }
- </script>
+</script>
 
 <table class="leftAlign rowSelection">
   <tr>
@@ -61,9 +56,10 @@ function iscriviTiratore(idLicenza){
     $iscritti = array();
     Iscritto::loadDbData($iscritti, array($licId), $nome, $cognome);
     if (count($iscritti) != 0){
+      echo "Da iscritti";
       foreach ($iscritti as &$iscritto){
         $id = $iscritto->id();
-        echo '<tr onclick="updateIscritto('.$id.')">
+        echo '<tr onclick="iscriviTiratore('.$id.')">
                 <td>hidden col</td>
                 <td>'.$id().'</td>
                 <td>'.$iscritto->cognome().'</td>
@@ -73,6 +69,7 @@ function iscriviTiratore(idLicenza){
               </tr>';
       }
     } else {
+      echo "Da Licenza";
       $tiratori = array();
       Licenza::loadDbData($tiratori, array($licId), $nome, $cognome);
       foreach ($tiratori as &$tiratore){

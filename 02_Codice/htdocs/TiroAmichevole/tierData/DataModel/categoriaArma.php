@@ -81,7 +81,7 @@
     while ($r = $rows->fetch())
     {
       $id = $r['idCategoria'];
-      $listaCatArma[$id] = CategoriaEta::LoadDbData($id);
+      $listaCatArma[$id] = CategoriaArma::LoadDbData($id);
     }
   }
   

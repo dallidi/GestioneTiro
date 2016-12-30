@@ -8,7 +8,7 @@
   <div class="row centro col-12">
     <?php
        $classOption["all"] = "enable";  // all -> entire list
-       $classOption["_pageTemplate"] = "selected";
+       $classOption["iscrizioni"] = "selected";
        require "$__ROOT__/navigation.php" 
     ?>
     <div id="pageHtml" class="col-8">

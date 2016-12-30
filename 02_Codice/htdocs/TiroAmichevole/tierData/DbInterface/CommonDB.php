@@ -35,4 +35,9 @@
   function convertDateFormat($dateStr, $fromFormat, $toFormat){
     return date_format(date_create_from_format($fromFormat, $dateStr), $toFormat);
   }
+  
+  function sqlNow(){
+    return date("Y-m-d H:i:s");
+  }
+  
 ?>

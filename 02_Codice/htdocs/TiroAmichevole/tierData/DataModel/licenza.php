@@ -37,8 +37,8 @@
                                       $nome = "", $cognome = "")
     {
       global $db;
-      $idList = implode(',', $idLicenze);
-      dbgTrace($idList);
+      $ids = array_filter($idLicenze, 'is_int');
+      $idList = implode(',', $ids);
       if ($idList == ""){
         $idList = "0";
       }
@@ -92,11 +92,11 @@
     public static function licenceDbData($idLicenza)
     {
       $tiratori = array();
-      $ids = array($idLicenza);
+      $ids = array(intval($idLicenza));
       Licenza::loadDbData($tiratori, $ids);
       if (count($tiratori) != 1){
-        dbgTrace("ERROR", "Tiratore non univoco $id. ".$tiratori);
-        throw new Exception("Tiratore non univoco $id. $tiratori");
+        dbgTrace("ERROR", "Tiratore non univoco $idLicenza.");
+        throw new Exception("Tiratore non univoco $idLicenza.");
       }
       return reset($tiratori);
     }
@@ -105,6 +105,16 @@
     public function iscrivi(){
       global $db;
       $id = $this->Id;
+      $sql = "SELECT count(*) AS records, Licenze_idLicenza
+              FROM Iscrizioni
+              WHERE Licenze_idLicenza = $id";
+      dbgTrace($sql);
+      $rows = $db->query($sql);
+      $count = $rows->fetch()["records"];
+      dbgTrace("rows count = $count");
+      if ($count > 0){
+        return;
+      }
       $sql = "INSERT INTO Iscrizioni
               (Licenze_idLicenza)
               VALUES

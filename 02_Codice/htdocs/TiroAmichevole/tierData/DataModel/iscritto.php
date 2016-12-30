@@ -9,6 +9,8 @@
                "/TierData/DataModel/categoriaEta.php";
   require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
                "/TierData/DataModel/societa.php";
+  require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
+               "/TierData/DataModel/serie.php";
   require_once $_SERVER["DOCUMENT_ROOT"].
                '/TiroAmichevole/TierData/DbInterface/CommonDB.php';
   
@@ -18,14 +20,16 @@
     public $CatArma;
     public $CatEta;
     public $Societa;
-    public $Serie;
+    public $Series;
+    public $LastUpdate;
     
     public function __construct()
     {
       
     }
     
-    public static function create($Id, $Licenza, $CatArma, $CatEta, $Societa, $Serie)
+    public static function create($Id, $Licenza, $CatArma, $CatEta, $Societa,
+                                  $Series)
     {
       $instance = new self();
       $instance->Id = $Id;
@@ -33,7 +37,8 @@
       $instance->CatArma = $CatArma;
       $instance->CatEta = $CatEta;
       $instance->Societa = $Societa;
-      $instance->Serie = $Serie;
+      $instance->Series = $Series;
+      $instance->LastUpdate = sqlNow();
       return $instance;
     }
 
@@ -41,7 +46,8 @@
                                       $nome = "", $cognome = "")
     {
       global $db;
-      $idList = implode(',', $idIscritti);
+      $ids = array_filter($idIscritti, 'is_int');
+      $idList = implode(',', $ids);
       if ($idList == ""){
         $idList = "0";
       }
@@ -51,28 +57,26 @@
       dbgTrace($sql);
       $rows = $db->query($sql);
       while ($r = $rows->fetch()){
-        $idLic = $r["Licenze_idLicenza"];
-
-
-
-  // $tiratori = array();
-  // $ids = array($id);
-  // Licenza::loadDbData($tiratori, $ids);
-  // if (count($tiratori) != 1){
-    // internalRedirectTo("/nav/error.php?errTxt=Tiratore non univoco!");
-    // dbgTrace("ERROR", "Tiratore non univoco $id. ".$tiratori);
-    // return;
-  // }
-  // $tiratore = reset($tiratori);
-
-        $instances[$idLic] = 
-          Iscritto::create($idLic, 
+        $idLic = intval($r["Licenze_idLicenza"]);
+        unset($series);
+        $series = array();
+        $sqlS = "SELECT *
+                 FROM Iscrizioni_has_Serie
+                 WHERE Iscrizioni_Licenze_idLicenza = $idLic";
+        $rowsS = $db->query($sqlS);
+        while ($rs = $rowsS->fetch()){
+          $series[] = Serie::serieDbData($rs["Serie_idSerie"]);
+        }
+        foreach($series as $serie){
+          dbgTrace("Serie: ".$serie->Id.") ".$serie->Descrizione);
+        }
+        $instances[$idLic] = Iscritto::create($idLic, 
                    Licenza::licenceDbData($idLic),
                    CategoriaArma::loadDbData($r["CategoriaArmi_idCategoria"]),  
                    CategoriaEta::loadDbData($r["CategoriaEta_idCategoriaEta"]),
                    Societa::societaDbData($r["Societa_idSocieta"]),
-                   NULL);
-      }
+                   $series);
+     }
     }
     
     public function id(){
@@ -89,6 +93,11 @@
     
     public function dataNascita(){
       return $this->Licenza->dataNascita();
+    }
+    
+    public function eta(){
+      $an = intval(date_format(date_create($this->dataNascita()), "Y"));
+      return intval(date("Y")) - $an;
     }
     
     public function indirizzo(){
@@ -111,6 +120,43 @@
       return $this->CatArma->catArmaId();
     }
     
+    public function aggiornaDb(){
+      global $db;
+      
+      $sql = "UPDATE Iscrizioni
+              SET CategoriaArmi_idCategoria=".$this->CatArma->Id.",
+                  CategoriaEta_idCategoriaEta=".$this->CatEta->Id.",
+                  Societa_idSocieta=".$this->Societa->Id.",
+                  lastUpdate='".sqlNow()."'
+              WHERE Licenze_idLicenza=".$this->Id;
+      dbgTrace("update iscrizioni sql=$sql");
+      $db->query($sql);
+
+      $sql = "DELETE FROM Iscrizioni_has_Serie
+              WHERE Iscrizioni_Licenze_idLicenza=".$this->Id;
+      dbgTrace("clear Iscrizioni_has_Serie sql=$sql");
+      $db->query($sql);
+      
+      foreach($this->Series as $serie){
+        $sql = "INSERT INTO Iscrizioni_has_Serie
+                  (Iscrizioni_Licenze_idLicenza, Serie_idSerie)
+                VALUES (".$this->Id.",".$serie->Id.")";
+        dbgTrace("INSERT INTO Iscrizioni_has_Serie sql=$sql");
+        $db->query($sql);
+      }
+    }
+
+    public function aggiorna($catArmaId, $catEtaId, $societaId, $serieIds){
+      $this->CatArma = CategoriaArma::loadDbData($catArmaId);
+      $this->CatEta = CategoriaEta::loadDbData($catEtaId);
+      $this->Societa = Societa::societaDbData($societaId);
+      unset($this->Series);
+      $this->Series = array();
+      foreach($serieIds as $serieId){
+        $this->Series[] = Serie::serieDbData($serieId);
+      }
+      $this->aggiornaDb();
+    }
 
     public function fullName(){
       return $this->Licenza->Cognome . " " . $this->Licenza->Nome;
@@ -136,9 +182,14 @@
       }
       return 1;
     }
-
-    function iscrivi(){
-        global $db;
+    
+    public function hasSerie($idSerie){
+      foreach($this->Series as $serie){
+        if ($serie->Id == $idSerie){
+          return true;
+        }
       }
+      return false;
+    }
   } 
 ?>

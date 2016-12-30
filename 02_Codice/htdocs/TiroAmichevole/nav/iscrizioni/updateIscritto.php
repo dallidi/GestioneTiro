@@ -8,13 +8,24 @@
   <div class="row centro col-12">
     <?php
        $classOption["all"] = "enable";  // all -> entire list
-       $classOption["_pageTemplate"] = "selected";
+       $classOption["iscrizioni"] = "selected";
        require "$__ROOT__/navigation.php" 
     ?>
     <div id="pageHtml" class="col-8">
     <!-- ADD YOUR CODE HERE ----------------------------------------------------->
       <?php
-        require "updateIscrittoPage.php";
+        require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
+                     '/helpers/requestParameters.php';
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+          $id = readGetInt("licenza");
+          require "$__ROOT__/nav/iscrizioni/updateIscrittoPage.php";
+        } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+          $id = readPostInt("licenza");
+          require "$__ROOT__/nav/iscrizioni/updateIscrittoAction.php";
+          require "$__ROOT__/nav/iscrizioni/updateIscrittoPage.php";
+        } else {
+          return;
+        }        
       ?>
     <!-- END OF CUSTOM PAGE CODE ------------------------------------------------>
     </div>

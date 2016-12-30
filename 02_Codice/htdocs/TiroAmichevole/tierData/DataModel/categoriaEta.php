@@ -41,8 +41,9 @@
               WHERE idCategoriaEta = '$idCatEta'";
       $rows = $db->query($sql);
       if ($r = $rows->fetch()){
-        return CategoriaArma::Create($r["idCategoriaEta"], $r["descrizione"],
-                                     $r["codice"], $r["etaMin"], $r["etaMax"]);
+        return CategoriaEta::Create($r["idCategoriaEta"], $r["codice"], 
+                                    $r["descrizione"], 
+                                    $r["etaMin"], $r["etaMax"]);
       }
       return NULL;
     }
