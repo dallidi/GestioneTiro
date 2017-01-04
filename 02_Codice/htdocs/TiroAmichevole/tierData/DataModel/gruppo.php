@@ -1,6 +1,6 @@
 <?php
   // require_once "$_SERVER["DOCUMENT_ROOT"]/TiroAmichevole".
-               // "/gruppo.php";
+               // "/TierData/DataModel/gruppo.php";
   require_once 'CategoriaArma.php'
   
   class Gruppo {
@@ -9,25 +9,25 @@
     public $CatArma;
     public $Tiratori;
     
-    public function gruppoNil()
-    {
-      $this->Id = 0;
-      $this->Nome = "";
-      $this->CatArma = new CategoriaArma;
-      $this->Tiratori = new array();
-    }
-
-    public function __construct()
-    {
-      $this->gruppoNil();
+    public function __construct(){
     }
     
-    public static function Create($Id, $Nome)
-    {
+    public static function Create($Id, $Nome, $CatArma, $Tiratori){
       $instance = new self();
       $instance->Id = $Id;
       $instance->Nome = $Nome;
+      $instance->CatArma = $CatArma;
+      $instance->Tiratori = $Tiratori;
       return $instance;
+    }
+    
+    public function addTiratore($tiratore){
+      if (!isset($this->Tiratori)){
+        $this->Tiratori = array();
+      }
+      if (count($this->Tiratori) >= 5){
+        throw new Exception("")
+      }
     }
   }
   

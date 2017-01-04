@@ -56,7 +56,6 @@ function iscriviTiratore(idLicenza){
     $iscritti = array();
     Iscritto::loadDbData($iscritti, array($licId), $nome, $cognome);
     if (count($iscritti) != 0){
-      echo "Da iscritti";
       foreach ($iscritti as &$iscritto){
         $id = $iscritto->id();
         echo '<tr onclick="iscriviTiratore('.$id.')">
@@ -73,7 +72,6 @@ function iscriviTiratore(idLicenza){
               </tr>';
       }
     } else {
-      echo "Da Licenza";
       $tiratori = array();
       Licenza::loadDbData($tiratori, array($licId), $nome, $cognome);
       foreach ($tiratori as &$tiratore){

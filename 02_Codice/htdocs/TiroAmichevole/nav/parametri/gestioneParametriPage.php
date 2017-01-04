@@ -1,21 +1,22 @@
 <?php
-  require_once "$__ROOT__/TierData/dataModel/iscritto.php";
-  require_once "$__ROOT__/TierData/dataModel/serie.php";
-  require_once "$__ROOT__/TierData/dataModel/categoriaArma.php";
-  require_once "$__ROOT__/TierData/dataModel/categoriaEta.php";
+  require_once "$__ROOT__/TierData/dataModel/parametro.php";
   require_once "$__ROOT__/helpers/debug.php";
   
-  $iscritti = array();
-  $idList = array($id);
-  Iscritto::loadDbData($iscritti, $idList);
-  $count = count($iscritti);
-  if ($count != 1){
-    dbgTrace("Tiratore non univoco $id, count=$count", cDbgError);
-    internalRedirectTo("/nav/error.php?errTxt=Tiratore non univoco!");
-    return;
+  function createParam($nome, $minVal, $maxVal, $defVal = null){
+    ParInt::Create($nome);
+    $params[$nome]->setMinValue(1);
+    $params[$nome]->setMaxValue(100);
+    if ($defVal != null){
+      $params[$nome]->setValue(5);
+    }
   }
-  $iscritto = reset($iscritti);
-  // $iscritto->aggiornaDb();
+  createParam("noTiratoriGruppo", 1, 100);
+  createParam("testParam1", 1, 100, );
+  createParam("testParam2", 1, 100, );
+  createParam("testParam3", 1, 100, );
+  createParam("testParam4", 1, 100, );
+  createParam("testParam5", 1, 100, );
+  createParam("testParam6", 1, 100, );
 ?>
 <form action="/TiroAmichevole/nav/iscrizioni/updateIscritto.php" method="post">
   <table class="leftAlign topAlign" style="padding-bottom: 0">

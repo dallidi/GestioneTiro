@@ -61,7 +61,6 @@
       $sql = "SELECT *
               FROM Licenze
               $where";
-      dbgTrace($sql);
       $rows = $db->query($sql);
       while ($r = $rows->fetch())
       {
@@ -108,10 +107,8 @@
       $sql = "SELECT count(*) AS records, Licenze_idLicenza
               FROM Iscrizioni
               WHERE Licenze_idLicenza = $id";
-      dbgTrace($sql);
       $rows = $db->query($sql);
       $count = $rows->fetch()["records"];
-      dbgTrace("rows count = $count");
       if ($count > 0){
         return;
       }
@@ -119,7 +116,6 @@
               (Licenze_idLicenza)
               VALUES
               ($id)";
-      dbgTrace($sql);
       $db->query($sql);
     }
 

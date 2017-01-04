@@ -54,7 +54,6 @@
       $query = "Licenze_idLicenza IN ($idList)";    
       $sql = "SELECT * FROM `Iscrizioni` 
               WHERE $query";
-      dbgTrace($sql);
       $rows = $db->query($sql);
       while ($r = $rows->fetch()){
         $idLic = intval($r["Licenze_idLicenza"]);
@@ -66,9 +65,6 @@
         $rowsS = $db->query($sqlS);
         while ($rs = $rowsS->fetch()){
           $series[] = Serie::serieDbData($rs["Serie_idSerie"]);
-        }
-        foreach($series as $serie){
-          dbgTrace("Serie: ".$serie->Id.") ".$serie->Descrizione);
         }
         $instances[$idLic] = Iscritto::create($idLic, 
                    Licenza::licenceDbData($idLic),
@@ -129,19 +125,16 @@
                   Societa_idSocieta=".$this->Societa->Id.",
                   lastUpdate='".sqlNow()."'
               WHERE Licenze_idLicenza=".$this->Id;
-      dbgTrace("update iscrizioni sql=$sql");
       $db->query($sql);
 
       $sql = "DELETE FROM Iscrizioni_has_Serie
               WHERE Iscrizioni_Licenze_idLicenza=".$this->Id;
-      dbgTrace("clear Iscrizioni_has_Serie sql=$sql");
       $db->query($sql);
       
       foreach($this->Series as $serie){
         $sql = "INSERT INTO Iscrizioni_has_Serie
                   (Iscrizioni_Licenze_idLicenza, Serie_idSerie)
                 VALUES (".$this->Id.",".$serie->Id.")";
-        dbgTrace("INSERT INTO Iscrizioni_has_Serie sql=$sql");
         $db->query($sql);
       }
     }

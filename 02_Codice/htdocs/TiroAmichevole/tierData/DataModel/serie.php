@@ -50,7 +50,6 @@
       $sql = "SELECT *
               FROM Serie
               WHERE $query";
-      dbgTrace($sql);
       $rows = $db->query($sql);
       while ($r = $rows->fetch())
       {
@@ -92,7 +91,6 @@
     $sql = "SELECT idSerie, descrizione
             FROM `Serie` 
             ORDER BY descrizione ASC";
-    dbgTrace  ($sql);
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {

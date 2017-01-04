@@ -53,7 +53,6 @@
       $sql = "SELECT *
               FROM Societa
               WHERE $query";
-      // dbgTrace($sql);
       $rows = $db->query($sql);
       while ($r = $rows->fetch())
       {

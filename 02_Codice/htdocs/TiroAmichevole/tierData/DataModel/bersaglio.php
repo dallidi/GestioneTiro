@@ -43,7 +43,6 @@
       $sql = "SELECT *
               FROM Bersagli
               WHERE $query";
-      // dbgTrace($sql);
       $rows = $db->query($sql);
       while ($r = $rows->fetch())
       {

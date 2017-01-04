@@ -9,14 +9,13 @@
   require_once $_SERVER["DOCUMENT_ROOT"]."/TiroAmichevole".
                "/TierData/DataModel/societa.php";
   
-  dbgTrace("licenza=$id");
   $iscritti = array();
   $idList = array($id);
   Iscritto::loadDbData($iscritti, $idList);
   $count = count($iscritti);
   if ($count != 1){
-    internalRedirectTo("/nav/error.php?errTxt=Tiratore non univoco!");
     dbgTrace("Tiratore non univoco $id, count=$count", cDbgError);
+    internalRedirectTo("/nav/error.php?errTxt=Tiratore non univoco!");
     return;
   }
   $iscritto = reset($iscritti);

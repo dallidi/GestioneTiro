@@ -5,10 +5,8 @@
   
   $id = 0;
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    dbgTrace("method post");
     if (isset($_POST["licenza"])){
       $id = intval($_POST["licenza"]);
-      dbgTrace("licence set to $id");
     } else {
       internalRedirectTo("/nav/error.php?errTxt=Invalid post!");
       return;
@@ -18,16 +16,14 @@
   }
   $tiratori = array();
   $idList = array($id);
-  dbgTrace("loading licence");
   Licenza::loadDbData($tiratori, $idList);
   if (count($tiratori) != 1){
+    dbgTrace("ERROR", "Tiratore non univoco $id.");
     internalRedirectTo("/nav/error.php?errTxt=Tiratore non univoco!");
-    dbgTrace("ERROR", "Tiratore non univoco $id. ");
     return;
   }
   $tiratore = reset($tiratori);
   $tiratore->iscrivi();
   $id = $tiratore->id();
-  dbgTrace("redirecting to updateIscritto licenza=$id");
   internalRedirectTo("/nav/iscrizioni/updateIscritto.php?licenza=$id");
 ?>

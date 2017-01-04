@@ -105,6 +105,10 @@ table.leftAlign{
   text-align: left;
 }
 
+table.topAlign td{
+  vertical-align: top;
+}
+
 table.rowSelection tr td:nth-child(1), 
 table.rowSelection th:nth-child(1){
   display: none;

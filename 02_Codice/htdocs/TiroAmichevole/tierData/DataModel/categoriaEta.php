@@ -33,6 +33,15 @@
       $instance->EtaMin = $EtaMin;
       return $instance;
     }
+    
+    public function isAgeOk($dataNascita){
+      $an = intval(date_format(date_create($dataNascita), "Y"));
+      $age = intval(date("Y")) - $an;
+      if (($this->EtaMin <= $age) && ($age <= $this->EtaMax)){
+        return true;
+      }
+      return false;
+    }
 
     public static function LoadDbData($idCatEta)
     {
@@ -43,7 +52,7 @@
       if ($r = $rows->fetch()){
         return CategoriaEta::Create($r["idCategoriaEta"], $r["codice"], 
                                     $r["descrizione"], 
-                                    $r["etaMin"], $r["etaMax"]);
+                                    $r["etaMax"], $r["etaMin"]);
       }
       return NULL;
     }
@@ -75,7 +84,6 @@
     }
     $sql = "SELECT * FROM `Licenze` 
             WHERE idLicenza IN ($idList) $query;";
-    dbgTrace  ($sql);
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {
@@ -91,7 +99,6 @@
             FROM `CategoriaEta` 
             WHERE etaMin <= $age <= etaMax
             ORDER BY etaMin DESC";
-    dbgTrace  ($sql);
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {
@@ -104,8 +111,7 @@
     global $db;
     $sql = "SELECT idCategoriaEta, etaMin
             FROM `CategoriaEta` 
-            ORDER BY etaMin ASC";
-    dbgTrace  ($sql);
+            ORDER BY etaMin DESC";
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {

@@ -62,7 +62,6 @@
     }
     $sql = "SELECT * FROM `Licenze` 
             WHERE idLicenza IN ($idList) $query;";
-    dbgTrace  ($sql);
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {
@@ -76,7 +75,6 @@
     $sql = "SELECT idCategoria, codiceCat
             FROM `CategoriaArmi` 
             ORDER BY codiceCat ASC";
-    dbgTrace  ($sql);
     $rows = $db->query($sql);
     while ($r = $rows->fetch())
     {
